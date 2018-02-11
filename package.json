@@ -18,5 +18,9 @@
     "jest-resolve": "^22.1.4",
     "prettier": "^1.10.2",
     "prettier-eslint": "^8.8.1"
+  },
+  "dependencies": {
+    "dark-sky": "^1.1.2",
+    "express": "^4.16.2"
   }
 }
