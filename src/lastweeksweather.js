@@ -23,29 +23,46 @@ const start = () => {
   app.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`))
 }
 
+const oneDaysWeather = async (latitude, longitude, time) => {
+  const url = `https://api.darksky.net/forecast/${DARK_SKY_API_KEY}/${latitude},${longitude},${time}?exclude=currently,minutely,hourly,alerts,flags`
+
+  return new Promise(resolve => {
+    try {
+      https
+        .get(url, resp => {
+          let data = ''
+
+          resp.on('data', chunk => {
+            data += chunk
+          })
+
+          resp.on('end', () => {
+            resolve(data)
+          })
+        })
+
+        .on('error', err => {
+          resolve(undefined)
+        })
+    } catch (e) {
+      resolve(undefined)
+    }
+  })
+}
+
 const weatherFor = async location => {
   const { latitude, longitude } = location
-  const time = Math.floor(new Date() / MS_PER_SECOND) - 7 * SECONDS_PER_DAY
-  const url = `https://api.darksky.net/forecast/${DARK_SKY_API_KEY}/${latitude},${longitude},${time}`
+  let result = []
 
-  https
-    .get(url, resp => {
-      let data = ''
+  for (let i = 7; i > 0; i--) {
+    const time = Math.floor(new Date() / MS_PER_SECOND) - i * SECONDS_PER_DAY
+    const data = await oneDaysWeather(latitude, longitude, time)
+    result.push(JSON.parse(data))
+  }
 
-      resp.on('data', chunk => {
-        data += chunk
-      })
-
-      resp.on('end', () => {
-        console.log(`url:`, url)
-        console.log(`data:`, data)
-      })
-    })
-
-    .on('error', err => {
-      console.log(`url:`, url)
-      console.log('Error: ' + err.message)
-    })
+  console.log(`result.length:`, result.length)
+  console.log(`result:`, result)
+  return result
 }
 
 start()
