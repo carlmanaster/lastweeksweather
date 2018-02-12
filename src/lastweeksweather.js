@@ -1,8 +1,28 @@
 const express = require('express')
-const app = express()
 
-const { PORT } = process.env
+const { PORT, DARK_SKY_API_KEY } = process.env
 
-app.get('/', (req, res) => res.send(`Last Week's Weather`))
+const CARL = {
+  latitude: 32.837453,
+  longitude: -117.220324,
+}
 
-app.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`))
+const start = () => {
+  const app = express()
+  app.get('/', (req, res) => res.send(`Last Week's Weather`))
+  const credits = `<html><body><a href="https://darksky.net/poweredby/">Powered by Dark Sky</a></body></html>`
+  app.get('/credits', (req, res) => res.send(credits))
+  app.get('/carl', (req, res) => res.send(weatherFor(CARL)))
+  app.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`))
+}
+
+const weatherFor = async location => {
+  const { latitude, longitude } = location
+}
+
+start()
+
+module.exports = {
+  start,
+  weatherFor,
+}
