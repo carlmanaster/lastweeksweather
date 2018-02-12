@@ -5,6 +5,7 @@
   "main": "src/lastweeksweather.js",
   "scripts": {
     "test": "jest",
+    "start": "node src/lastweeksweather.js",
     "lint": "esw .eslintrc.js src/ lib/ tests/ -w --fix --ignore-pattern !.eslintrc.js"
   },
   "author": "manaster@pobox.com",
