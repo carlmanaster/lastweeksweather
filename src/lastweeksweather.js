@@ -21,11 +21,41 @@ const WEEKDAYS = [
 const MS_PER_SECOND = 1e3
 const SECONDS_PER_DAY = 24 * 60 * 60
 
+const inputHtml = `
+<html>
+<body>
+
+<script>
+  function getTheWeather() {
+    const elements = document.getElementById("Form").elements;
+    const latitude = elements['latitude'].value
+    const longitude = elements['longitude'].value
+    window.location.href = "/weather/" + latitude + "/" + longitude;
+  }
+</script>
+
+<form id="Form" action="javascript:getTheWeather()">
+Latitude: <input type="text" name="latitude" value=32.837453><br>
+Longitude: <input type="text" name="longitude" value=-117.220324><br>
+<input type="submit" value="Get Last Week's Weather!">
+</form>
+
+</body>
+</html>`
+
 const start = () => {
   const app = express()
-  app.get('/', (req, res) => res.send(`Last Week's Weather`))
   const credits = `<html><body><a href="https://darksky.net/poweredby/">Powered by Dark Sky</a></body></html>`
   app.get('/credits', (req, res) => res.send(credits))
+
+  app.get('/', (req, res) => res.send(inputHtml))
+
+  app.get('/weather/:latitude/:longitude', async (req, res) => {
+    const { latitude, longitude } = req.params
+    const weather = await weatherFor({ latitude, longitude })
+    res.send(weather)
+  })
+
   app.get('/carl', async (req, res) => {
     const weather = await weatherFor(CARL)
     res.send(weather)
