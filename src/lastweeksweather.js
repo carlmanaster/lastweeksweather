@@ -8,6 +8,16 @@ const CARL = {
   longitude: -117.220324,
 }
 
+const WEEKDAYS = [
+  `Sunday`,
+  `Monday`,
+  `Tuesday`,
+  `Wednesday`,
+  `Thursday`,
+  `Friday`,
+  `Saturday`,
+]
+
 const MS_PER_SECOND = 1e3
 const SECONDS_PER_DAY = 24 * 60 * 60
 
@@ -50,18 +60,30 @@ const oneDaysWeather = async (latitude, longitude, time) => {
   })
 }
 
+const usefulBits = json => {
+  const { time, summary, temperatureLow, temperatureHigh } = json.daily.data[0]
+  return { time, summary, temperatureLow, temperatureHigh }
+}
+
+const tableRow = r => {
+  const day = WEEKDAYS[new Date(r.time * 1e3).getDay()]
+  const low = Math.round(r.temperatureLow)
+  const high = Math.round(r.temperatureHigh)
+  return `<tr><td>${day}</td><td>${low}-${high}</td><td>${r.summary}</td></tr>`
+}
+
 const weatherFor = async location => {
   const { latitude, longitude } = location
-  let result = []
+  const tableHead = `<tr><th>Day</th><th>Temperatures</th><th>Summary</th></tr>`
+  let result = `<html><body><table>${tableHead}`
 
   for (let i = 7; i > 0; i--) {
     const time = Math.floor(new Date() / MS_PER_SECOND) - i * SECONDS_PER_DAY
     const data = await oneDaysWeather(latitude, longitude, time)
-    result.push(JSON.parse(data))
+    result += tableRow(usefulBits(JSON.parse(data))) + '\n'
   }
 
-  console.log(`result.length:`, result.length)
-  console.log(`result:`, result)
+  result += `</table></body></html>`
   return result
 }
 
